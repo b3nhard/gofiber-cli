@@ -2022,7 +2022,7 @@ func getProjectName(projectDir string) (string, error) {
 // getGitUsername attempts to get the GitHub username
 func getGitUsername() (string, error) {
 	// First, try to get from git config
-	cmd := exec.Command("git", "config", "--get", "user.name")
+	cmd := exec.Command("git", "config", "--get", "user.username")
 	output, err := cmd.Output()
 	if err == nil && len(output) > 0 {
 		return strings.TrimSpace(string(output)), nil
