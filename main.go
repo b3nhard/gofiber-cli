@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -485,6 +486,17 @@ func main() {
 func createProject(projectName string) {
 	fmt.Printf("Creating a new Go Fiber project: %s\n", projectName)
 
+	// Get GitHub username
+	username, err := getGitUsername()
+	if err != nil {
+		fmt.Printf("Error getting GitHub username: %v\n", err)
+		return
+	}
+
+	// Format the full project import path
+	fullProjectPath := fmt.Sprintf("github.com/%s/%s", username, projectName)
+	fmt.Printf("Creating a new Go Fiber project: %s\n", fullProjectPath)
+
 	// Create project directory
 	if err := os.MkdirAll(projectName, 0755); err != nil {
 		fmt.Printf("Error creating project directory: %v\n", err)
@@ -530,7 +542,7 @@ func createProject(projectName string) {
 		Name:          projectName,
 		Resource:      strings.ToLower(projectName),
 		ResourceURL:   strings.ToLower(projectName),
-		ProjectImport: projectName,
+		ProjectImport: fmt.Sprintf("github.com/%s/%s", username, projectName),
 	}
 
 	if err := tmpl.Execute(moduleInterfaceFile, data); err != nil {
@@ -588,7 +600,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/spf13/cobra v1.8.0
 )
-`, projectName)
+`, fullProjectPath)
 
 	goModFile, err := os.Create(filepath.Join(projectName, "go.mod"))
 	if err != nil {
@@ -874,7 +886,6 @@ func toKebabCase(s string) string {
 	return strings.Replace(s, "_", "-", -1)
 }
 
-
 func getProjectName(dir string) (string, error) {
 	// Try to read go.mod file to get the module name
 	goModPath := filepath.Join(dir, "go.mod")
@@ -893,4 +904,31 @@ func getProjectName(dir string) (string, error) {
 	}
 
 	return "", fmt.Errorf("module name not found in go.mod")
+}
+
+func getGitUsername() (string, error) {
+	// Try getting from git config
+	cmd := exec.Command("git", "config", "--get", "user.username")
+	output, err := cmd.Output()
+	if err == nil && len(output) > 0 {
+		return strings.TrimSpace(string(output)), nil
+	}
+
+	// If git config fails, try getting from environment variable
+	username := os.Getenv("GITHUB_USERNAME")
+	if username != "" {
+		return username, nil
+	}
+
+	// If both methods fail, prompt the user
+	var answer string
+	prompt := &survey.Input{
+		Message: "Enter your GitHub username:",
+	}
+	err = survey.AskOne(prompt, &answer)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(answer), nil
 }
