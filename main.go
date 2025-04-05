@@ -499,7 +499,7 @@ func createProject(projectName string) {
 		"repositories",
 		"config",
 		"modules",
-		"middleware",
+		"middlewares",
 		"utils",
 	}
 
@@ -752,8 +752,12 @@ func generateComponent(componentType, componentName, modulePath, parentModule st
 	var dirPath string
 
 	if modulePath != "" {
-		// If module path is specified, use it
-		dirPath = filepath.Join(currentDir, modulePath, componentType+"s")
+		// If module path is specified, use it with plural if repository
+		if componentType == "repository" {
+			dirPath = filepath.Join(currentDir, modulePath, "repositories")
+		} else {
+			dirPath = filepath.Join(currentDir, modulePath, componentType+"s")
+		}
 	} else {
 		// Otherwise use the default directory
 		dirPath = filepath.Join(currentDir, componentType+"s")
@@ -869,6 +873,7 @@ func toKebabCase(s string) string {
 	s = toSnakeCase(s)
 	return strings.Replace(s, "_", "-", -1)
 }
+
 
 func getProjectName(dir string) (string, error) {
 	// Try to read go.mod file to get the module name
