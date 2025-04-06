@@ -1694,6 +1694,7 @@ func createModule(moduleName, parentModule string, skipTests bool) error {
 	// Determine if this is a submodule
 	isSubmodule := parentModule != ""
 
+	// repository should be plural as repositories
 	// Create module directory structure
 	modulePath := filepath.Join("modules", resourceURL)
 	if isSubmodule {
@@ -1720,9 +1721,6 @@ func createModule(moduleName, parentModule string, skipTests bool) error {
 	}
 
 	// Create the module file
-	if currentDir ==="repository" {
-		
-	}
 	moduleFilePath := filepath.Join(currentDir, modulePath, fmt.Sprintf("%s_module.go", resourceURL))
 
 	moduleFile, err := os.Create(moduleFilePath)
@@ -1763,6 +1761,10 @@ func createModule(moduleName, parentModule string, skipTests bool) error {
 	// Generate controller, service, repository, and DTO
 	components := []string{"controller", "service", "repository", "dto"}
 	for _, component := range components {
+		// repository  folder should be plural as repositories
+		if component == "repository" {
+			component = "repositories"
+		}
 		if err := generateComponent(component, moduleName, filepath.Join(modulePath), parentModule, false, skipTests); err != nil {
 			return fmt.Errorf("failed to generate %s: %w", component, err)
 		}
@@ -1783,7 +1785,7 @@ func createModule(moduleName, parentModule string, skipTests bool) error {
 
 		// Check if parent module exists
 		if _, err := os.Stat(parentModulePath); err == nil {
-			
+
 			// TODO: Update parent module to include this submodule
 			// This would require parsing Go code which is beyond the scope of this example
 		}
@@ -1833,7 +1835,10 @@ func generateComponent(componentType, componentName, modulePath, parentModule st
 	// Determine file path and name
 	componentDir := ""
 	packageName := ""
-
+	// repository should be plural as repositories
+	if componentType == "repository" {
+		componentType = "repositories"
+	}
 	// For tests, use the module path provided
 	if componentType == "test" {
 		componentDir = modulePath
