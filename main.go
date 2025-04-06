@@ -1720,6 +1720,9 @@ func createModule(moduleName, parentModule string, skipTests bool) error {
 	}
 
 	// Create the module file
+	if currentDir ==="repository" {
+		
+	}
 	moduleFilePath := filepath.Join(currentDir, modulePath, fmt.Sprintf("%s_module.go", resourceURL))
 
 	moduleFile, err := os.Create(moduleFilePath)
@@ -1780,6 +1783,7 @@ func createModule(moduleName, parentModule string, skipTests bool) error {
 
 		// Check if parent module exists
 		if _, err := os.Stat(parentModulePath); err == nil {
+			
 			// TODO: Update parent module to include this submodule
 			// This would require parsing Go code which is beyond the scope of this example
 		}
