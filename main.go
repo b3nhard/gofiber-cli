@@ -1761,10 +1761,7 @@ func createModule(moduleName, parentModule string, skipTests bool) error {
 	// Generate controller, service, repository, and DTO
 	components := []string{"controller", "service", "repository", "dto"}
 	for _, component := range components {
-		// repository  folder should be plural as repositories
-		if component == "repository" {
-			component = "repositories"
-		}
+
 		if err := generateComponent(component, moduleName, filepath.Join(modulePath), parentModule, false, skipTests); err != nil {
 			return fmt.Errorf("failed to generate %s: %w", component, err)
 		}
@@ -1835,10 +1832,7 @@ func generateComponent(componentType, componentName, modulePath, parentModule st
 	// Determine file path and name
 	componentDir := ""
 	packageName := ""
-	// repository should be plural as repositories
-	if componentType == "repository" {
-		componentType = "repositories"
-	}
+
 	// For tests, use the module path provided
 	if componentType == "test" {
 		componentDir = modulePath
@@ -1847,12 +1841,15 @@ func generateComponent(componentType, componentName, modulePath, parentModule st
 		// If flat structure, place directly in module path
 		componentDir = modulePath
 		packageName = filepath.Base(modulePath)
+	} else if componentType == "repository" {
+		// repository should be plural as repositories
+		componentDir = filepath.Join(modulePath, "repositories")
+		packageName = "repositories"
 	} else {
 		// Otherwise use standard structure with component type as directory
 		componentDir = filepath.Join(modulePath, componentType+"s")
 		packageName = componentType + "s"
 	}
-
 	// Create directory if it doesn't exist
 	if err := os.MkdirAll(filepath.Join(currentDir, componentDir), 0755); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
