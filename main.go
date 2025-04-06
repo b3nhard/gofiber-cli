@@ -1061,7 +1061,7 @@ func main() {
 				fmt.Printf("  parentModule.AddSubmodule(submodule)\n")
 			} else {
 				fmt.Printf(infoColor("\nTo use this module, add it to your main.go:\n"))
-				fmt.Printf("\n  %sModule := modules.New%sModule()\n", toSnakeCase(moduleName), toCamelCase(moduleName))
+				fmt.Printf("\n  %sModule := %s.New%sModule()\n", toSnakeCase(moduleName), moduleName, toCamelCase(moduleName))
 				fmt.Printf("  %sModule.Register(app)\n", toSnakeCase(moduleName))
 			}
 		},
